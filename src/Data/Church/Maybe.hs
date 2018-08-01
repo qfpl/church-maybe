@@ -1,5 +1,6 @@
 {-# language NoImplicitPrelude #-}
 {-# language RankNTypes #-}
+{-# language CPP #-}
 
 module Data.Church.Maybe
   ( Maybe(..), just, nothing, maybe, isNothing, isJust, fromMaybe
@@ -9,6 +10,11 @@ module Data.Church.Maybe
 where
 
 import Control.Applicative (Alternative(..), Applicative(..))
+#if __GLASGOW_HASKELL__ < 802
+import Control.DeepSeq (NFData(..))
+#else
+import Control.DeepSeq (NFData(..), NFData1(..))
+#endif
 import Control.Monad (Monad(..), MonadPlus(..), liftM2)
 import Control.Monad.Fix (MonadFix(..))
 import Control.Monad.Zip (MonadZip(..))
@@ -22,7 +28,7 @@ import Data.Functor.Bind (Bind(..))
 import Data.Monoid (Monoid(..))
 import Data.Semigroup (Semigroup(..))
 import Data.Traversable (Traversable(..))
-import GHC.Err (errorWithoutStackTrace)
+import GHC.Err (error)
 
 newtype Maybe a = Maybe { unMaybe :: forall r. r -> (a -> r) -> r }
 
@@ -111,7 +117,7 @@ instance MonadFix Maybe where
   {-# inline mfix #-}
   mfix f =
     let
-      x = f (unMaybe x (errorWithoutStackTrace "mfix Maybe: Nothing") id)
+      x = f (unMaybe x (error "mfix Maybe: Nothing") id)
     in
       x
 
@@ -136,3 +142,11 @@ instance Foldable Maybe where
 instance Traversable Maybe where
   {-# inline traverse #-}
   traverse f m = unMaybe m (pure nothing) (fmap just . f)
+
+instance NFData a => NFData (Maybe a) where
+  rnf (Maybe m) = m () rnf
+
+#if __GLASGOW_HASKELL__ >= 802
+instance NFData1 Maybe where
+  liftRnf f (Maybe m) = m () f
+#endif
