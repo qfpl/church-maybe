@@ -3,7 +3,8 @@
 {-# language CPP #-}
 
 module Data.Church.Maybe
-  ( Maybe(..), just, nothing, maybe, isNothing, isJust, fromMaybe
+  ( just, nothing, Maybe(..)
+  , maybe, isNothing, isJust, fromMaybe
   , listToMaybe, maybeToList
   , catMaybes, mapMaybe
   )
