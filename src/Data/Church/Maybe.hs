@@ -144,6 +144,7 @@ instance Traversable Maybe where
   {-# inline traverse #-}
   traverse f m = unMaybe m (pure nothing) (fmap just . f)
 
+-- | And 'NFData1' for GHC >=8.2
 instance NFData a => NFData (Maybe a) where
   rnf (Maybe m) = m () rnf
 
