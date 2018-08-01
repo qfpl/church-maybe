@@ -3,7 +3,7 @@
 
 name:                church-maybe
 version:             0.1.0.0
--- synopsis:
+synopsis:            Church encoded Maybe
 -- description:
 license:             BSD3
 --                   Must be spelled with a 'C' for nix
